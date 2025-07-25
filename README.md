@@ -427,3 +427,12 @@ open $(terraform output -raw web_interface_url)
 **Built with ❤️ by the CloudOps Architecture Team**
 
 *This project demonstrates enterprise-grade cloud architecture principles applied to a real-world IoT solution, showcasing the power of AWS serverless technologies and Infrastructure as Code.*
+
+**⚠️ Disclaimer
+La documentación incluida en este repositorio ha sido generada mediante Amazon Q Developer CLI, y puede contener descripciones automáticas que requieren ajustes o validaciones adicionales.
+
+Aunque la implementación técnica ha sido completada y funcional en entorno de pruebas, este proyecto no está listo para ambientes productivos.
+
+Esta solución ha sido desarrollada con fines educativos y demostrativos.
+
+El uso de este código o arquitectura queda bajo responsabilidad de quien lo implemente. Se recomienda realizar revisiones exhaustivas antes de utilizarlo en contextos reales de producción.**
