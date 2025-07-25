@@ -1,0 +1,15 @@
+# Configuración de ejemplo para la plataforma de seguimiento vehicular
+
+# Región de AWS
+aws_region = "us-east-1"
+
+# Información del proyecto
+project_name = "vehicle-tracking"
+environment = "prod"
+
+# Configuración de red
+vpc_cidr = "10.0.0.0/16"
+
+# Capacidad esperada
+max_vehicles = 5000
+signals_per_second = 5000

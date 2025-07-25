@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking - Portal de Pruebas</title>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1563.0.min.js"></script>
+    <script src="https://unpkg.com/amazon-cognito-identity-js@6.3.12/dist/amazon-cognito-identity.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .auth-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .module-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .module-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .module-btn.client {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .module-btn.sales {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .module-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .login-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .dashboard {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-1px);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 5px solid #4facfe;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .card-content {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .api-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .api-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .api-btn {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .api-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .api-response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online { background-color: #28a745; }
+        .status-offline { background-color: #dc3545; }
+        .status-warning { background-color: #ffc107; }
+
+        .vehicle-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .vehicle-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .vehicle-id {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .vehicle-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .sales-action-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .sales-action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            width: 100%;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-results {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .client-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .client-details {
+            flex: 1;
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .client-meta {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .edit-btn:hover {
+            background: #ffb300;
+        }
+
+        .assign-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .assign-btn:hover {
+            background: #138496;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        
+        /* Tablets (768px and down) */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .auth-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .dashboard {
+                padding: 20px;
+            }
+
+            .module-selector {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .module-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .dashboard-card {
+                padding: 20px;
+            }
+
+            .card-title {
+                font-size: 1.2rem;
+            }
+
+            .api-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .api-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .vehicle-list {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .api-response {
+                font-size: 0.8rem;
+                padding: 15px;
+                max-height: 300px;
+            }
+        }
+
+        /* Mobile phones (480px and down) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .auth-section {
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            .dashboard {
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            .module-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                letter-spacing: 0.5px;
+            }
+
+            .login-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .dashboard-title {
+                font-size: 1.3rem;
+            }
+
+            .logout-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+
+            .dashboard-card {
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .card-content {
+                font-size: 0.9rem;
+            }
+
+            .api-btn {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .vehicle-item {
+                padding: 12px;
+            }
+
+            .vehicle-id {
+                font-size: 0.9rem;
+            }
+
+            .api-response {
+                font-size: 0.75rem;
+                padding: 12px;
+                max-height: 250px;
+            }
+
+            .api-section {
+                margin-top: 20px;
+                padding-top: 20px;
+            }
+        }
+
+        /* Large screens (1200px and up) */
+        @media (min-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .vehicle-list {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        /* Extra small screens (320px and down) */
+        @media (max-width: 320px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .auth-section, .dashboard {
+                padding: 12px;
+            }
+
+            .module-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .login-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .dashboard-card {
+                padding: 12px;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .api-response {
+                font-size: 0.7rem;
+                padding: 10px;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                margin-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            .auth-section, .dashboard {
+                padding: 15px;
+            }
+
+            .dashboard-grid {
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .api-section {
+                margin-top: 20px;
+                padding-top: 20px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .module-btn, .login-btn, .logout-btn, .api-btn {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            .form-group input {
+                min-height: 44px;
+            }
+
+            .vehicle-item {
+                min-height: 60px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .header h1 {
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Vehicle Tracking System</h1>
+            <p>Portal de Pruebas - Módulos Cliente y Ventas</p>
+        </div>
+
+        <div class="auth-section" id="authSection">
+            <div class="module-selector">
+                <button class="module-btn client active" onclick="selectModule('client')">
+                    👤 Módulo Cliente
+                </button>
+                <button class="module-btn sales" onclick="selectModule('sales')">
+                    💼 Módulo Ventas
+                </button>
+            </div>
+
+            <form class="login-form" onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Ingrese su usuario">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Ingrese su contraseña">
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div id="loginMessage"></div>
+        </div>
+
+        <div class="dashboard" id="dashboard">
+            <div class="dashboard-header">
+                <h2 class="dashboard-title" id="dashboardTitle">Dashboard</h2>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+            </div>
+
+            <div class="dashboard-grid" id="dashboardContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <div class="api-section">
+                <h3>🔧 Pruebas de API</h3>
+                <div class="api-controls" id="apiControls">
+                    <!-- API buttons will be loaded dynamically -->
+                </div>
+                <div class="api-response" id="apiResponse">
+                    Seleccione una API para probar...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="test-data.js"></script>
+    <script>
+        let currentModule = 'client';
+        let currentUser = null;
+        let authToken = null;
+
+        // AWS Cognito configuration
+        const poolData = {
+            UserPoolId: CONFIG.COGNITO_USER_POOL_ID,
+            ClientId: CONFIG.COGNITO_CLIENT_ID
+        };
+        const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+        function selectModule(module) {
+            console.log('🔄 selectModule called with:', module);
+            currentModule = module;
+            console.log('🔄 currentModule set to:', currentModule);
+            
+            // Update button states
+            document.querySelectorAll('.module-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.module-btn.${module}`).classList.add('active');
+            
+            // Clear placeholders - no hints for realistic experience
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            usernameInput.placeholder = 'Ingrese su usuario';
+            passwordInput.placeholder = 'Ingrese su contraseña';
+            
+            // IMPORTANTE: Cargar el contenido del dashboard después del login
+            console.log('🔄 About to call loadDashboardContent for module:', module);
+            
+            // DEBUGGING ESPECÍFICO PARA VENTAS
+            if (module === 'sales') {
+                console.log('🛒 SALES MODULE SELECTED - Starting detailed debugging...');
+                console.log('🔍 Current module:', currentModule);
+                console.log('🔍 Module type check:', currentModule === 'sales');
+            }
+        }
+
+        function login(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('loginMessage');
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading"></span> Iniciando sesión...';
+            messageDiv.innerHTML = '';
+            
+            console.log('Attempting login with:', { username, userPoolId: CONFIG.COGNITO_USER_POOL_ID, clientId: CONFIG.COGNITO_CLIENT_ID });
+            
+            // Verificar que las librerías estén cargadas
+            if (typeof AmazonCognitoIdentity === 'undefined') {
+                messageDiv.innerHTML = '<div class="error">❌ Error: Librería de Cognito no cargada</div>';
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Iniciar Sesión';
+                return;
+            }
+            
+            const authenticationData = {
+                Username: username,
+                Password: password,
+            };
+            
+            const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+            const userData = {
+                Username: username,
+                Pool: userPool
+            };
+            
+            const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+            
+            cognitoUser.authenticateUser(authenticationDetails, {
+                onSuccess: function (result) {
+                    console.log('Login successful:', result);
+                    authToken = result.getIdToken().getJwtToken();
+                    currentUser = {
+                        username: username,
+                        module: currentModule,
+                        token: authToken
+                    };
+                    
+                    messageDiv.innerHTML = '<div class="success">✅ Inicio de sesión exitoso</div>';
+                    
+                    setTimeout(() => {
+                        showDashboard();
+                    }, 1000);
+                },
+                
+                onFailure: function(err) {
+                    console.error('Login failed:', err);
+                    let errorMessage = err.message;
+                    
+                    // Mensajes de error más amigables
+                    if (err.code === 'NotAuthorizedException') {
+                        errorMessage = 'Usuario o contraseña incorrectos';
+                    } else if (err.code === 'UserNotConfirmedException') {
+                        errorMessage = 'Usuario no confirmado. Revise su email.';
+                    } else if (err.code === 'PasswordResetRequiredException') {
+                        errorMessage = 'Se requiere restablecer la contraseña';
+                    } else if (err.code === 'UserNotFoundException') {
+                        errorMessage = 'Usuario no encontrado';
+                    } else if (err.code === 'TooManyRequestsException') {
+                        errorMessage = 'Demasiados intentos. Intente más tarde.';
+                    }
+                    
+                    messageDiv.innerHTML = `<div class="error">❌ Error: ${errorMessage}</div>`;
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Iniciar Sesión';
+                },
+                
+                newPasswordRequired: function(userAttributes, requiredAttributes) {
+                    console.log('New password required:', userAttributes);
+                    
+                    // Mostrar formulario de cambio de contraseña
+                    messageDiv.innerHTML = `
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Cambio de Contraseña Requerido</h4>
+                            <p style="color: #856404; margin-bottom: 15px;">Debe establecer una nueva contraseña para continuar.</p>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <input type="password" id="newPassword" placeholder="Nueva contraseña" 
+                                       style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" 
+                                       style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <button onclick="completeNewPasswordChallenge()" 
+                                        style="padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    Establecer Nueva Contraseña
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Guardar el usuario para completar el desafío
+                    window.currentCognitoUser = cognitoUser;
+                    window.userAttributes = userAttributes;
+                    window.requiredAttributes = requiredAttributes;
+                    
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Iniciar Sesión';
+                },
+                
+                mfaRequired: function(codeDeliveryDetails) {
+                    console.log('MFA required:', codeDeliveryDetails);
+                    messageDiv.innerHTML = '<div class="error">⚠️ Se requiere autenticación de dos factores</div>';
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Iniciar Sesión';
+                }
+            });
+        }
+
+        function completeNewPasswordChallenge() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (!newPassword || !confirmPassword) {
+                messageDiv.innerHTML += '<div class="error">Por favor complete ambos campos de contraseña.</div>';
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                messageDiv.innerHTML += '<div class="error">Las contraseñas no coinciden.</div>';
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                messageDiv.innerHTML += '<div class="error">La contraseña debe tener al menos 8 caracteres.</div>';
+                return;
+            }
+            
+            const cognitoUser = window.currentCognitoUser;
+            const userAttributes = window.userAttributes;
+            const requiredAttributes = window.requiredAttributes;
+            
+            messageDiv.innerHTML = '<div class="loading"></div> Estableciendo nueva contraseña...';
+            
+            cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
+                onSuccess: function(result) {
+                    console.log('Password change successful:', result);
+                    authToken = result.getIdToken().getJwtToken();
+                    currentUser = {
+                        username: cognitoUser.username,
+                        module: currentModule,
+                        token: authToken
+                    };
+                    
+                    messageDiv.innerHTML = '<div class="success">✅ Contraseña actualizada. Iniciando sesión...</div>';
+                    
+                    setTimeout(() => {
+                        showDashboard();
+                    }, 1500);
+                },
+                
+                onFailure: function(err) {
+                    console.error('Password change failed:', err);
+                    let errorMessage = err.message;
+                    
+                    if (err.code === 'InvalidPasswordException') {
+                        errorMessage = 'La contraseña no cumple con los requisitos de seguridad';
+                    } else if (err.code === 'LimitExceededException') {
+                        errorMessage = 'Demasiados intentos. Intente más tarde.';
+                    }
+                    
+                    messageDiv.innerHTML = `<div class="error">❌ Error al cambiar contraseña: ${errorMessage}</div>`;
+                }
+            });
+        }
+
+        function showDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            console.log('showDashboard called with currentModule:', currentModule);
+            
+            const title = currentModule === 'client' ? 
+                '👤 Dashboard Cliente' : '💼 Dashboard Ventas';
+            document.getElementById('dashboardTitle').textContent = title;
+            
+            loadDashboardContent();
+            loadApiControls();
+        }
+
+        function loadDashboardContent() {
+            const content = document.getElementById('dashboardContent');
+            
+            console.log('Loading dashboard content for module:', currentModule);
+            console.log('Module type check - client:', currentModule === 'client');
+            console.log('Module type check - sales:', currentModule === 'sales');
+            
+            if (currentModule === 'client') {
+                console.log('Loading CLIENT module content');
+                content.innerHTML = `
+                    <div class="dashboard-card">
+                        <div class="card-title">🚗 Mis Vehículos</div>
+                        <div class="card-content">
+                            <div class="vehicle-list" id="clientVehicles">
+                                <div class="loading"></div> Cargando vehículos...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">📊 Estado del Sistema</div>
+                        <div class="card-content">
+                            <div class="vehicle-status">
+                                <span class="status-indicator status-online"></span>
+                                Sistema operativo
+                            </div>
+                            <div class="vehicle-status">
+                                <span class="status-indicator status-online"></span>
+                                API Gateway conectado
+                            </div>
+                            <div class="vehicle-status">
+                                <span class="status-indicator status-warning"></span>
+                                Modo de prueba activo
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">🔔 Notificaciones</div>
+                        <div class="card-content">
+                            <p>• Sistema de seguimiento activo</p>
+                            <p>• Alertas de pánico configuradas</p>
+                            <p>• Monitoreo en tiempo real disponible</p>
+                        </div>
+                    </div>
+                `;
+                loadClientVehicles();
+            } else {
+                console.log('Loading SALES module content for module:', currentModule);
+                
+                // Verificar que los datos existen antes de usarlos
+                const contractsCount = TEST_DATA.contracts ? TEST_DATA.contracts.length : 0;
+                const vehiclesCount = TEST_DATA.vehicles ? TEST_DATA.vehicles.length : 0;
+                const alertsCount = TEST_DATA.fleetDashboard && TEST_DATA.fleetDashboard.recent_alerts 
+                    ? TEST_DATA.fleetDashboard.recent_alerts.length : 0;
+                
+                console.log('Sales data check:', {
+                    contracts: contractsCount,
+                    vehicles: vehiclesCount,
+                    alerts: alertsCount
+                });
+                
+                content.innerHTML = `
+                    <div class="dashboard-card">
+                        <div class="card-title">📈 Resumen de Ventas</div>
+                        <div class="card-content">
+                            <p><strong>Contratos Activos:</strong> ${contractsCount}</p>
+                            <p><strong>Vehículos Monitoreados:</strong> ${vehiclesCount}</p>
+                            <p><strong>Alertas Recientes:</strong> ${alertsCount}</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">👥 Gestión de Clientes</div>
+                        <div class="card-content">
+                            <button class="sales-action-btn" onclick="window.showNewClientForm()">
+                                ➕ Nuevo Cliente
+                            </button>
+                            <button class="sales-action-btn" onclick="window.showSearchClientForm()">
+                                🔍 Buscar Cliente
+                            </button>
+                            <button class="sales-action-btn" onclick="window.showClientList()">
+                                📋 Lista de Clientes
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">🚗 Gestión de Vehículos</div>
+                        <div class="card-content">
+                            <button class="sales-action-btn" onclick="window.showNewVehicleForm()">
+                                🚗 Nuevo Vehículo
+                            </button>
+                            <button class="sales-action-btn" onclick="window.showVehicleInventory()">
+                                📦 Inventario
+                            </button>
+                            <button class="sales-action-btn" onclick="window.showAssignVehicleForm()">
+                                🔗 Asignar Vehículo
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">📋 Contratos y Reportes</div>
+                        <div class="card-content">
+                            <p><strong>Contratos Pendientes:</strong> ${TEST_DATA.contracts.filter(c => c.status === 'pending').length}</p>
+                            <p><strong>Contratos Activos:</strong> ${TEST_DATA.contracts.filter(c => c.status === 'active').length}</p>
+                            <button class="sales-action-btn" onclick="window.generateSalesReport()">
+                                📊 Generar Reporte
+                            </button>
+                            <button class="sales-action-btn" onclick="console.log('Test button clicked!'); alert('Botón de prueba funcionando!');" style="background: #dc3545; margin-top: 10px;">
+                                🧪 Botón de Prueba
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            console.log('Dashboard content loaded successfully');
+        }
+
+        function loadClientVehicles() {
+            const vehiclesContainer = document.getElementById('clientVehicles');
+            
+            // Simulate loading
+            setTimeout(() => {
+                const clientVehicles = TEST_DATA.vehicles.slice(0, 6);
+                vehiclesContainer.innerHTML = clientVehicles.map(vehicle => `
+                    <div class="vehicle-item">
+                        <div class="vehicle-id">${vehicle.vehicle_id}</div>
+                        <div class="vehicle-status">
+                            <span class="status-indicator ${vehicle.status === 'active' ? 'status-online' : 'status-offline'}"></span>
+                            ${vehicle.status === 'active' ? 'En línea' : 'Desconectado'}
+                        </div>
+                        <div>Ubicación: ${vehicle.location.lat.toFixed(4)}, ${vehicle.location.lng.toFixed(4)}</div>
+                    </div>
+                `).join('');
+            }, 1500);
+        }
+
+        function loadApiControls() {
+            const controls = document.getElementById('apiControls');
+            
+            if (currentModule === 'client') {
+                controls.innerHTML = `
+                    <button class="api-btn" onclick="testApi('vehicles')">🚗 Obtener Vehículos</button>
+                    <button class="api-btn" onclick="testApi('fleet-dashboard')">📊 Dashboard Flota</button>
+                    <button class="api-btn" onclick="testApi('notifications')">🔔 Enviar Notificación</button>
+                `;
+            } else {
+                controls.innerHTML = `
+                    <button class="api-btn" onclick="testApi('vehicles')">🚗 Gestionar Vehículos</button>
+                    <button class="api-btn" onclick="testApi('reports')">📈 Generar Reportes</button>
+                    <button class="api-btn" onclick="testApi('fleet-dashboard')">📊 Dashboard Flota</button>
+                    <button class="api-btn" onclick="testApi('notifications')">🔔 Sistema Notificaciones</button>
+                `;
+            }
+            
+            // Verificar que las funciones del módulo de ventas estén disponibles
+            if (currentModule === 'sales') {
+                console.log('Sales module loaded. Available functions:', {
+                    showNewClientForm: typeof window.showNewClientForm,
+                    showSearchClientForm: typeof window.showSearchClientForm,
+                    showNewVehicleForm: typeof window.showNewVehicleForm,
+                    showAssignVehicleForm: typeof window.showAssignVehicleForm,
+                    showClientList: typeof window.showClientList,
+                    showVehicleInventory: typeof window.showVehicleInventory,
+                    generateSalesReport: typeof window.generateSalesReport
+                });
+                
+                // Verificar si las funciones están realmente disponibles
+                console.log('Window object sales functions check:', {
+                    showNewClientForm: 'showNewClientForm' in window,
+                    showSearchClientForm: 'showSearchClientForm' in window,
+                    showClientList: 'showClientList' in window,
+                    showNewVehicleForm: 'showNewVehicleForm' in window,
+                    showVehicleInventory: 'showVehicleInventory' in window,
+                    generateSalesReport: 'generateSalesReport' in window
+                });
+                
+                // Test de función específica
+                try {
+                    console.log('Testing showNewClientForm function...');
+                    if (typeof window.showNewClientForm === 'function') {
+                        console.log('✅ showNewClientForm is available as function');
+                    } else {
+                        console.error('❌ showNewClientForm is not a function:', typeof window.showNewClientForm);
+                    }
+                } catch (error) {
+                    console.error('❌ Error testing showNewClientForm:', error);
+                }
+            }
+        }
+
+        async function testApi(endpoint) {
+            const responseDiv = document.getElementById('apiResponse');
+            responseDiv.innerHTML = '<div class="loading"></div> Ejecutando prueba de API...';
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/${endpoint}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                responseDiv.innerHTML = `
+                    <strong>✅ Respuesta de ${endpoint}:</strong>
+                    <br><br>
+                    Status: ${response.status}
+                    <br><br>
+                    ${JSON.stringify(data, null, 2)}
+                `;
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <strong>❌ Error en ${endpoint}:</strong>
+                    <br><br>
+                    ${error.message}
+                `;
+            }
+        }
+
+        function logout() {
+            // Limpiar variables globales
+            currentUser = null;
+            authToken = null;
+            
+            // Limpiar cualquier modal abierto
+            const modal = document.getElementById('salesModal');
+            if (modal) {
+                modal.remove();
+            }
+            
+            // Ocultar dashboard y mostrar auth section
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('authSection').style.display = 'block';
+            
+            // Limpiar formularios
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginMessage').innerHTML = '';
+            
+            // Rehabilitar botón de login
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Iniciar Sesión';
+            
+            // Limpiar sesión de Cognito
+            try {
+                const cognitoUser = userPool.getCurrentUser();
+                if (cognitoUser) {
+                    cognitoUser.signOut();
+                }
+            } catch (error) {
+                console.log('Error clearing Cognito session:', error);
+            }
+            
+            // Resetear módulo seleccionado
+            selectModule('client');
+            
+            console.log('Logout completed successfully');
+        }
+
+        // Initialize
+        selectModule('client');
+        
+        // Función para probar la conectividad
+        function testConnectivity() {
+            console.log('Testing connectivity...');
+            console.log('CONFIG:', CONFIG);
+            console.log('User Pool:', userPool);
+            console.log('AWS SDK loaded:', typeof AWS !== 'undefined');
+            console.log('Cognito Identity loaded:', typeof AmazonCognitoIdentity !== 'undefined');
+            
+            // Mostrar información de debug en la interfaz
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = `
+                <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
+                    <strong>🔧 Información de Debug:</strong><br>
+                    • User Pool ID: ${CONFIG.COGNITO_USER_POOL_ID}<br>
+                    • Client ID: ${CONFIG.COGNITO_CLIENT_ID}<br>
+                    • API Base URL: ${CONFIG.API_BASE_URL}<br>
+                    • AWS SDK: ${typeof AWS !== 'undefined' ? '✅ Cargado' : '❌ No cargado'}<br>
+                    • Cognito SDK: ${typeof AmazonCognitoIdentity !== 'undefined' ? '✅ Cargado' : '❌ No cargado'}<br><br>
+                    <strong>Usuarios de prueba:</strong><br>
+                    • Cliente: cliente_test / TempPass123!<br>
+                    • Ventas: ventas_test / TempPass123!<br>
+                    • Admin: admin_test / TempPass123!
+                </div>
+            `;
+        }
+        
+        // Agregar botón de debug
+        document.addEventListener('DOMContentLoaded', function() {
+            const authSection = document.getElementById('authSection');
+            const debugBtn = document.createElement('button');
+            debugBtn.innerHTML = '🔧 Mostrar Info Debug';
+            debugBtn.className = 'api-btn';
+            debugBtn.style.marginTop = '10px';
+            debugBtn.onclick = testConnectivity;
+            authSection.appendChild(debugBtn);
+        });
+
+        // ===== FUNCIONES DEL MÓDULO DE VENTAS (GLOBALES) =====
+        console.log('🔧 Declaring sales module functions...');
+        
+        // Declarar funciones globalmente para que estén disponibles
+        window.showNewClientForm = function() {
+            console.log('✅ showNewClientForm called successfully');
+            const modal = createModal('Nuevo Cliente', `
+                <form onsubmit="submitNewClient(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientName">Nombre Completo *</label>
+                            <input type="text" id="clientName" required placeholder="Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label for="clientEmail">Email *</label>
+                            <input type="email" id="clientEmail" required placeholder="juan@email.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientPhone">Teléfono *</label>
+                            <input type="tel" id="clientPhone" required placeholder="+1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label for="clientCompany">Empresa</label>
+                            <input type="text" id="clientCompany" placeholder="Empresa ABC">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientAddress">Dirección *</label>
+                        <input type="text" id="clientAddress" required placeholder="123 Calle Principal, Ciudad">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientType">Tipo de Cliente</label>
+                            <select id="clientType">
+                                <option value="individual">Individual</option>
+                                <option value="corporate">Corporativo</option>
+                                <option value="government">Gobierno</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientPriority">Prioridad</label>
+                            <select id="clientPriority">
+                                <option value="standard">Estándar</option>
+                                <option value="premium">Premium</option>
+                                <option value="vip">VIP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Crear Cliente</button>
+                </form>
+            `);
+            showModal(modal);
+        };
+
+        window.showSearchClientForm = function() {
+            console.log('showSearchClientForm called');
+            const modal = createModal('Buscar Cliente', `
+                <div class="form-group">
+                    <label for="searchTerm">Buscar por nombre, email o teléfono</label>
+                    <input type="text" id="searchTerm" placeholder="Ingrese término de búsqueda..." 
+                           oninput="searchClients(this.value)">
+                </div>
+                <div class="search-results" id="searchResults">
+                    <p style="text-align: center; color: #666;">Ingrese un término para buscar clientes</p>
+                </div>
+            `);
+            showModal(modal);
+        };
+
+        window.showNewVehicleForm = function() {
+            console.log('showNewVehicleForm called');
+            const modal = createModal('Nuevo Vehículo', `
+                <form onsubmit="submitNewVehicle(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleBrand">Marca *</label>
+                            <select id="vehicleBrand" required>
+                                <option value="">Seleccionar marca</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Ford">Ford</option>
+                                <option value="Chevrolet">Chevrolet</option>
+                                <option value="Nissan">Nissan</option>
+                                <option value="Honda">Honda</option>
+                                <option value="Hyundai">Hyundai</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleModel">Modelo *</label>
+                            <input type="text" id="vehicleModel" required placeholder="Corolla">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleYear">Año *</label>
+                            <input type="number" id="vehicleYear" required min="2000" max="2025" placeholder="2024">
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleColor">Color</label>
+                            <input type="text" id="vehicleColor" placeholder="Blanco">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleVIN">VIN *</label>
+                            <input type="text" id="vehicleVIN" required placeholder="1HGBH41JXMN109186">
+                        </div>
+                        <div class="form-group">
+                            <label for="vehiclePlate">Placa</label>
+                            <input type="text" id="vehiclePlate" placeholder="ABC-123">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleType">Tipo de Vehículo</label>
+                            <select id="vehicleType">
+                                <option value="sedan">Sedán</option>
+                                <option value="suv">SUV</option>
+                                <option value="truck">Camioneta</option>
+                                <option value="van">Van</option>
+                                <option value="motorcycle">Motocicleta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleStatus">Estado</label>
+                            <select id="vehicleStatus">
+                                <option value="available">Disponible</option>
+                                <option value="sold">Vendido</option>
+                                <option value="maintenance">Mantenimiento</option>
+                                <option value="reserved">Reservado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Agregar Vehículo</button>
+                </form>
+            `);
+            showModal(modal);
+        };
+
+        function showAssignVehicleForm() {
+            const modal = createModal('Asignar Vehículo a Cliente', `
+                <form onsubmit="submitVehicleAssignment(event)">
+                    <div class="form-group">
+                        <label for="assignClient">Cliente *</label>
+                        <select id="assignClient" required>
+                            <option value="">Seleccionar cliente</option>
+                            ${TEST_DATA.contracts.map(contract => 
+                                `<option value="${contract.client_id}">${contract.client_name}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignVehicle">Vehículo *</label>
+                        <select id="assignVehicle" required>
+                            <option value="">Seleccionar vehículo</option>
+                            ${TEST_DATA.vehicles.filter(v => v.status === 'available').map(vehicle => 
+                                `<option value="${vehicle.vehicle_id}">${vehicle.vehicle_id} - ${vehicle.brand || 'Marca'} ${vehicle.model || 'Modelo'}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contractType">Tipo de Contrato</label>
+                            <select id="contractType">
+                                <option value="purchase">Compra</option>
+                                <option value="lease">Arrendamiento</option>
+                                <option value="rental">Alquiler</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contractDuration">Duración (meses)</label>
+                            <input type="number" id="contractDuration" min="1" max="60" placeholder="12">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contractNotes">Notas del Contrato</label>
+                        <textarea id="contractNotes" rows="3" placeholder="Notas adicionales..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Crear Contrato</button>
+                </form>
+            `);
+            showModal(modal);
+        }
+
+        function showClientList() {
+            const clientsHtml = TEST_DATA.contracts.map(contract => `
+                <div class="search-result-item">
+                    <div class="client-info">
+                        <div class="client-details">
+                            <div class="client-name">${contract.client_name}</div>
+                            <div class="client-meta">
+                                ID: ${contract.client_id} | Tipo: ${contract.vehicle_type} | Estado: ${contract.status}
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editClient('${contract.client_id}')">
+                                ✏️ Editar
+                            </button>
+                            <button class="action-btn assign-btn" onclick="showAssignVehicleForm()">
+                                🔗 Asignar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const modal = createModal('Lista de Clientes', `
+                <div class="search-results">
+                    ${clientsHtml}
+                </div>
+            `);
+            showModal(modal);
+        }
+
+        function showVehicleInventory() {
+            const vehiclesHtml = TEST_DATA.vehicles.slice(0, 10).map(vehicle => `
+                <div class="search-result-item">
+                    <div class="client-info">
+                        <div class="client-details">
+                            <div class="client-name">${vehicle.vehicle_id}</div>
+                            <div class="client-meta">
+                                Estado: ${vehicle.status} | Ubicación: ${vehicle.location.lat.toFixed(4)}, ${vehicle.location.lng.toFixed(4)}
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editVehicle('${vehicle.vehicle_id}')">
+                                ✏️ Editar
+                            </button>
+                            <button class="action-btn assign-btn" onclick="showAssignVehicleForm()">
+                                👤 Asignar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const modal = createModal('Inventario de Vehículos', `
+                <div class="search-results">
+                    ${vehiclesHtml}
+                </div>
+            `);
+            showModal(modal);
+        }
+
+        // Funciones de utilidad para modales
+        function createModal(title, content) {
+            return `
+                <div class="modal" id="salesModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${title}</h2>
+                            <button class="close-btn" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            ${content}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showModal(modalHtml) {
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('salesModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('salesModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Funciones de envío de formularios
+        function submitNewClient(event) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('clientName').value,
+                email: document.getElementById('clientEmail').value,
+                phone: document.getElementById('clientPhone').value,
+                company: document.getElementById('clientCompany').value,
+                address: document.getElementById('clientAddress').value,
+                type: document.getElementById('clientType').value,
+                priority: document.getElementById('clientPriority').value
+            };
+            
+            console.log('Nuevo cliente:', formData);
+            alert('✅ Cliente creado exitosamente!\n\nNombre: ' + formData.name + '\nEmail: ' + formData.email);
+            closeModal();
+        }
+
+        function submitNewVehicle(event) {
+            event.preventDefault();
+            const formData = {
+                brand: document.getElementById('vehicleBrand').value,
+                model: document.getElementById('vehicleModel').value,
+                year: document.getElementById('vehicleYear').value,
+                color: document.getElementById('vehicleColor').value,
+                vin: document.getElementById('vehicleVIN').value,
+                plate: document.getElementById('vehiclePlate').value,
+                type: document.getElementById('vehicleType').value,
+                status: document.getElementById('vehicleStatus').value
+            };
+            
+            console.log('Nuevo vehículo:', formData);
+            alert('✅ Vehículo agregado exitosamente!\n\nVIN: ' + formData.vin + '\nMarca: ' + formData.brand + ' ' + formData.model);
+            closeModal();
+        }
+
+        function submitVehicleAssignment(event) {
+            event.preventDefault();
+            const formData = {
+                client: document.getElementById('assignClient').value,
+                vehicle: document.getElementById('assignVehicle').value,
+                contractType: document.getElementById('contractType').value,
+                duration: document.getElementById('contractDuration').value,
+                notes: document.getElementById('contractNotes').value
+            };
+            
+            console.log('Asignación de vehículo:', formData);
+            alert('✅ Vehículo asignado exitosamente!\n\nCliente: ' + document.getElementById('assignClient').selectedOptions[0].text + '\nVehículo: ' + document.getElementById('assignVehicle').selectedOptions[0].text);
+            closeModal();
+        }
+
+        function searchClients(searchTerm) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!searchTerm.trim()) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #666;">Ingrese un término para buscar clientes</p>';
+                return;
+            }
+            
+            const filteredClients = TEST_DATA.contracts.filter(contract => 
+                contract.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                contract.client_id.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (filteredClients.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #666;">No se encontraron clientes</p>';
+                return;
+            }
+            
+            const resultsHtml = filteredClients.map(contract => `
+                <div class="search-result-item" onclick="selectClient('${contract.client_id}')">
+                    <div class="client-info">
+                        <div class="client-details">
+                            <div class="client-name">${contract.client_name}</div>
+                            <div class="client-meta">
+                                ID: ${contract.client_id} | Tipo: ${contract.vehicle_type} | Estado: ${contract.status}
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); editClient('${contract.client_id}')">
+                                ✏️ Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            resultsDiv.innerHTML = resultsHtml;
+        }
+
+        function selectClient(clientId) {
+            const client = TEST_DATA.contracts.find(c => c.client_id === clientId);
+            alert('Cliente seleccionado:\n\n' + client.client_name + '\nID: ' + client.client_id);
+        }
+
+        function editClient(clientId) {
+            const client = TEST_DATA.contracts.find(c => c.client_id === clientId);
+            const modal = createModal('Editar Cliente', `
+                <form onsubmit="updateClient(event, '${clientId}')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editClientName">Nombre Completo *</label>
+                            <input type="text" id="editClientName" required value="${client.client_name}">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientType">Tipo de Vehículo</label>
+                            <input type="text" id="editClientType" value="${client.vehicle_type}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientStatus">Estado del Contrato</label>
+                        <select id="editClientStatus">
+                            <option value="active" ${client.status === 'active' ? 'selected' : ''}>Activo</option>
+                            <option value="pending" ${client.status === 'pending' ? 'selected' : ''}>Pendiente</option>
+                            <option value="suspended" ${client.status === 'suspended' ? 'selected' : ''}>Suspendido</option>
+                            <option value="cancelled" ${client.status === 'cancelled' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">Actualizar Cliente</button>
+                </form>
+            `);
+            closeModal();
+            showModal(modal);
+        }
+
+        function updateClient(event, clientId) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('editClientName').value,
+                vehicleType: document.getElementById('editClientType').value,
+                status: document.getElementById('editClientStatus').value
+            };
+            
+            console.log('Cliente actualizado:', clientId, formData);
+            alert('✅ Cliente actualizado exitosamente!\n\nID: ' + clientId + '\nNombre: ' + formData.name);
+            closeModal();
+        }
+
+        function editVehicle(vehicleId) {
+            alert('Función de edición de vehículo para: ' + vehicleId + '\n\n(Esta funcionalidad se puede expandir según necesidades específicas)');
+        }
+
+        function generateSalesReport() {
+            const reportData = {
+                totalContracts: TEST_DATA.contracts.length,
+                activeContracts: TEST_DATA.contracts.filter(c => c.status === 'active').length,
+                pendingContracts: TEST_DATA.contracts.filter(c => c.status === 'pending').length,
+                totalVehicles: TEST_DATA.vehicles.length,
+                availableVehicles: TEST_DATA.vehicles.filter(v => v.status === 'available').length
+            };
+            
+            const modal = createModal('Reporte de Ventas', `
+                <div style="text-align: center;">
+                    <h3>📊 Resumen Ejecutivo</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #495057; margin: 0;">Total Contratos</h4>
+                            <p style="font-size: 2rem; font-weight: bold; color: #007bff; margin: 10px 0;">${reportData.totalContracts}</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #495057; margin: 0;">Contratos Activos</h4>
+                            <p style="font-size: 2rem; font-weight: bold; color: #28a745; margin: 10px 0;">${reportData.activeContracts}</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #495057; margin: 0;">Contratos Pendientes</h4>
+                            <p style="font-size: 2rem; font-weight: bold; color: #ffc107; margin: 10px 0;">${reportData.pendingContracts}</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #495057; margin: 0;">Vehículos Disponibles</h4>
+                            <p style="font-size: 2rem; font-weight: bold; color: #17a2b8; margin: 10px 0;">${reportData.availableVehicles}</p>
+                        </div>
+                    </div>
+                    <button class="submit-btn" onclick="downloadReport()">📥 Descargar Reporte PDF</button>
+                </div>
+            `);
+            showModal(modal);
+        }
+
+        function downloadReport() {
+            alert('📥 Descargando reporte...\n\n(En una implementación real, esto generaría y descargaría un PDF)');
+            closeModal();
+        }
+
+        // Funciones de utilidad para modales (GLOBALES)
+        window.createModal = function(title, content) {
+            return `
+                <div class="modal" id="salesModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${title}</h2>
+                            <button class="close-btn" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            ${content}
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.showModal = function(modalHtml) {
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('salesModal').style.display = 'block';
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('salesModal');
+            if (modal) {
+                modal.remove();
+            }
+        };
+
+        // Funciones de envío de formularios (GLOBALES)
+        window.submitNewClient = function(event) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('clientName').value,
+                email: document.getElementById('clientEmail').value,
+                phone: document.getElementById('clientPhone').value,
+                company: document.getElementById('clientCompany').value,
+                address: document.getElementById('clientAddress').value,
+                type: document.getElementById('clientType').value,
+                priority: document.getElementById('clientPriority').value
+            };
+            
+            console.log('Nuevo cliente:', formData);
+            alert('✅ Cliente creado exitosamente!\n\nNombre: ' + formData.name + '\nEmail: ' + formData.email);
+            closeModal();
+        };
+
+        window.submitNewVehicle = function(event) {
+            event.preventDefault();
+            const formData = {
+                brand: document.getElementById('vehicleBrand').value,
+                model: document.getElementById('vehicleModel').value,
+                year: document.getElementById('vehicleYear').value,
+                color: document.getElementById('vehicleColor').value,
+                vin: document.getElementById('vehicleVIN').value,
+                plate: document.getElementById('vehiclePlate').value,
+                type: document.getElementById('vehicleType').value,
+                status: document.getElementById('vehicleStatus').value
+            };
+            
+            console.log('Nuevo vehículo:', formData);
+            alert('✅ Vehículo agregado exitosamente!\n\nVIN: ' + formData.vin + '\nMarca: ' + formData.brand + ' ' + formData.model);
+            closeModal();
+        };
+
+        window.submitVehicleAssignment = function(event) {
+            event.preventDefault();
+            const formData = {
+                client: document.getElementById('assignClient').value,
+                vehicle: document.getElementById('assignVehicle').value,
+                contractType: document.getElementById('contractType').value,
+                duration: document.getElementById('contractDuration').value,
+                notes: document.getElementById('contractNotes').value
+            };
+            
+            console.log('Asignación de vehículo:', formData);
+            alert('✅ Vehículo asignado exitosamente!\n\nCliente: ' + document.getElementById('assignClient').selectedOptions[0].text + '\nVehículo: ' + document.getElementById('assignVehicle').selectedOptions[0].text);
+            closeModal();
+        };
+
+        window.searchClients = function(searchTerm) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!searchTerm.trim()) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #666;">Ingrese un término para buscar clientes</p>';
+                return;
+            }
+            
+            const filteredClients = TEST_DATA.contracts.filter(contract => 
+                contract.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                contract.client_id.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (filteredClients.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #666;">No se encontraron clientes</p>';
+                return;
+            }
+            
+            const resultsHtml = filteredClients.map(contract => `
+                <div class="search-result-item" onclick="selectClient('${contract.client_id}')">
+                    <div class="client-info">
+                        <div class="client-details">
+                            <div class="client-name">${contract.client_name}</div>
+                            <div class="client-meta">
+                                ID: ${contract.client_id} | Tipo: ${contract.vehicle_type} | Estado: ${contract.status}
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); editClient('${contract.client_id}')">
+                                ✏️ Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            resultsDiv.innerHTML = resultsHtml;
+        };
+
+        window.selectClient = function(clientId) {
+            const client = TEST_DATA.contracts.find(c => c.client_id === clientId);
+            alert('Cliente seleccionado:\n\n' + client.client_name + '\nID: ' + client.client_id);
+        };
+
+        window.editClient = function(clientId) {
+            const client = TEST_DATA.contracts.find(c => c.client_id === clientId);
+            const modal = createModal('Editar Cliente', `
+                <form onsubmit="updateClient(event, '${clientId}')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editClientName">Nombre Completo *</label>
+                            <input type="text" id="editClientName" required value="${client.client_name}">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientType">Tipo de Vehículo</label>
+                            <input type="text" id="editClientType" value="${client.vehicle_type}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientStatus">Estado del Contrato</label>
+                        <select id="editClientStatus">
+                            <option value="active" ${client.status === 'active' ? 'selected' : ''}>Activo</option>
+                            <option value="pending" ${client.status === 'pending' ? 'selected' : ''}>Pendiente</option>
+                            <option value="suspended" ${client.status === 'suspended' ? 'selected' : ''}>Suspendido</option>
+                            <option value="cancelled" ${client.status === 'cancelled' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">Actualizar Cliente</button>
+                </form>
+            `);
+            closeModal();
+            showModal(modal);
+        };
+
+        window.updateClient = function(event, clientId) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('editClientName').value,
+                vehicleType: document.getElementById('editClientType').value,
+                status: document.getElementById('editClientStatus').value
+            };
+            
+            console.log('Cliente actualizado:', clientId, formData);
+            alert('✅ Cliente actualizado exitosamente!\n\nID: ' + clientId + '\nNombre: ' + formData.name);
+            closeModal();
+        };
+
+        window.editVehicle = function(vehicleId) {
+            alert('Función de edición de vehículo para: ' + vehicleId + '\n\n(Esta funcionalidad se puede expandir según necesidades específicas)');
+        };
+
+        window.downloadReport = function() {
+            alert('📥 Descargando reporte...\n\n(En una implementación real, esto generaría y descargaría un PDF)');
+            closeModal();
+        };
+
+        // Cerrar modal al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('salesModal');
+            if (modal && event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ===== CONFIRMACIÓN DE FUNCIONES DECLARADAS =====
+        console.log('🎯 Sales module functions declaration completed!');
+        console.log('🔍 Final function check:', {
+            showNewClientForm: typeof window.showNewClientForm,
+            showSearchClientForm: typeof window.showSearchClientForm,
+            showClientList: typeof window.showClientList,
+            showNewVehicleForm: typeof window.showNewVehicleForm,
+            showVehicleInventory: typeof window.showVehicleInventory,
+            generateSalesReport: typeof window.generateSalesReport,
+            createModal: typeof window.createModal,
+            showModal: typeof window.showModal,
+            closeModal: typeof window.closeModal
+        });
+        console.log('✅ All sales functions should now be available globally!');;
+    </script>
+</body>
+</html>

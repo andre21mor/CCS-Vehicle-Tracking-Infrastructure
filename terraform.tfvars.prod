@@ -1,0 +1,46 @@
+# Production Environment Configuration
+environment = "production"
+region = "us-east-1"
+
+# Fleet Configuration
+vehicle_count = 500
+max_vehicles_per_fleet = 1000
+
+# Networking
+vpc_cidr = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# Domain Configuration
+domain_name = "fleet.yourcompany.com"
+# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+# Monitoring and Logging
+enable_detailed_monitoring = true
+log_retention_days = 90
+enable_xray_tracing = true
+
+# Performance and Scaling
+lambda_memory_size = 256
+dynamodb_billing_mode = "PROVISIONED"
+enable_dynamodb_autoscaling = true
+
+# Cost Optimization
+enable_reserved_capacity = true
+s3_lifecycle_enabled = true
+
+# Security
+enable_waf = true
+enable_shield_advanced = false
+mfa_required = true
+
+# Backup and Recovery
+backup_retention_days = 35
+enable_cross_region_backup = true
+
+# Tags
+tags = {
+  Environment = "production"
+  Project     = "vehicle-tracking"
+  Owner       = "cloudops-team"
+  CostCenter  = "engineering"
+}

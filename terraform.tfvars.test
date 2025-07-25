@@ -1,0 +1,28 @@
+# Configuración específica para prueba de 70 vehículos
+
+# Configuración básica
+aws_region = "us-east-1"
+project_name = "vehicle-tracking"
+environment = "test-70v"
+
+# Configuración de red optimizada para pruebas
+vpc_cidr = "10.1.0.0/16"
+
+# Configuración específica de la prueba
+test_vehicle_count = 70
+test_duration_days = 14  # 2 semanas
+
+# Capacidad esperada (reducida para pruebas)
+max_vehicles = 70
+signals_per_second = 70  # 1 señal por segundo por vehículo en promedio
+
+# Configuración de DocuSign (opcional para pruebas)
+# Dejar vacío si no se va a probar firma electrónica
+docusign_integration_key = ""
+docusign_user_id = ""
+docusign_account_id = ""
+docusign_private_key = ""
+docusign_base_url = "https://demo.docusign.net/restapi"
+
+# Email para notificaciones de prueba
+notification_email = "test-notifications@vehicletracking.com"

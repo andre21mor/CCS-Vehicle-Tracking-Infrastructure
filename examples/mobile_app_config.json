@@ -1,0 +1,89 @@
+{
+  "aws_config": {
+    "region": "us-east-1",
+    "cognito": {
+      "user_pool_id": "us-east-1_XXXXXXXXX",
+      "user_pool_web_client_id": "XXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "identity_pool_id": "us-east-1:XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+      "oauth_domain": "vehicle-tracking-prod-auth.auth.us-east-1.amazoncognito.com",
+      "oauth_scopes": ["email", "openid", "profile"],
+      "oauth_redirect_signin": "vehicletracking://callback",
+      "oauth_redirect_signout": "vehicletracking://logout",
+      "oauth_response_type": "code"
+    },
+    "api_gateway": {
+      "base_url": "https://XXXXXXXXXX.execute-api.us-east-1.amazonaws.com/prod",
+      "endpoints": {
+        "vehicles": "/vehicles",
+        "vehicle_detail": "/vehicles/{vehicleId}",
+        "vehicle_telemetry": "/vehicles/{vehicleId}/telemetry",
+        "vehicle_location": "/vehicles/{vehicleId}/location",
+        "vehicle_alerts": "/vehicles/{vehicleId}/alerts",
+        "fleet_dashboard": "/fleet/dashboard",
+        "reports": "/reports",
+        "notifications": "/notifications"
+      }
+    }
+  },
+  "app_config": {
+    "app_name": "Vehicle Tracking",
+    "version": "1.0.0",
+    "features": {
+      "real_time_tracking": true,
+      "push_notifications": true,
+      "offline_mode": true,
+      "video_streaming": true,
+      "panic_button": true,
+      "route_optimization": true,
+      "fuel_monitoring": true,
+      "maintenance_alerts": true
+    },
+    "map_config": {
+      "default_zoom": 15,
+      "max_zoom": 20,
+      "min_zoom": 5,
+      "map_style": "satellite",
+      "show_traffic": true,
+      "auto_center": true
+    },
+    "notification_config": {
+      "panic_alerts": {
+        "enabled": true,
+        "sound": "emergency",
+        "vibration": true,
+        "priority": "high"
+      },
+      "speed_alerts": {
+        "enabled": true,
+        "threshold": 120,
+        "sound": "warning",
+        "vibration": false
+      },
+      "fuel_alerts": {
+        "enabled": true,
+        "threshold": 15,
+        "sound": "notification",
+        "vibration": false
+      },
+      "maintenance_alerts": {
+        "enabled": true,
+        "advance_days": 7,
+        "sound": "notification",
+        "vibration": false
+      }
+    },
+    "refresh_intervals": {
+      "vehicle_location": 5000,
+      "telemetry_data": 10000,
+      "fleet_status": 30000,
+      "alerts": 15000
+    }
+  },
+  "security_config": {
+    "token_refresh_threshold": 300,
+    "max_retry_attempts": 3,
+    "request_timeout": 30000,
+    "certificate_pinning": true,
+    "biometric_auth": true
+  }
+}
