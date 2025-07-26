@@ -92,6 +92,9 @@ resource "aws_cloudfront_distribution" "web_interface" {
   is_ipv6_enabled     = true
   comment             = "Vehicle Tracking Web Interface Distribution"
   default_root_object = "index.html"
+  
+  # Integración con WAF (si está configurado)
+  web_acl_id = var.waf_web_acl_id != "" ? var.waf_web_acl_id : null
 
   # Configuración de caché para archivos estáticos
   default_cache_behavior {

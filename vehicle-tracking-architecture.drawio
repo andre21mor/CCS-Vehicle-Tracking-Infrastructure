@@ -1,0 +1,287 @@
+<mxfile host="app.diagrams.net" modified="2025-07-26T10:00:00.000Z" agent="Vehicle Tracking Infrastructure" etag="v1.0" version="24.7.6">
+  <diagram name="Vehicle Tracking AWS Architecture" id="aws-architecture">
+    <mxGraphModel dx="2500" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" background="#ffffff">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="Vehicle Tracking Infrastructure - AWS Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="600" y="10" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- External Users/Devices -->
+        <mxCell id="users-group" value="External Users &amp; Devices" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="200" height="300" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="web-users" value="Web Dashboard&#xa;Users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="70" y="120" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="mobile-users" value="Mobile App&#xa;Users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#F57C00;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="160" y="120" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="iot-devices" value="IoT Devices&#xa;(70 Vehicles)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#7B1FA2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="70" y="200" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="cameras" value="Vehicle&#xa;Cameras" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E91E63;strokeColor=#C2185B;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="160" y="200" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-agents" value="Sales&#xa;Agents" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#607D8B;strokeColor=#455A64;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="115" y="280" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- AWS Cloud -->
+        <mxCell id="aws-cloud" value="AWS Cloud (us-east-1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF6F00;fontSize=16;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="1280" height="900" as="geometry"/>
+        </mxCell>
+        
+        <!-- CDN & Security Layer -->
+        <mxCell id="cdn-layer" value="CDN &amp; Security Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="340" y="120" width="300" height="120" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="cloudfront" value="CloudFront&#xa;CDN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#F57C00;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="360" y="160" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="cognito" value="Cognito&#xa;Auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#7B1FA2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="540" y="160" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- API Layer -->
+        <mxCell id="api-layer" value="API Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="680" y="120" width="200" height="120" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="api-gateway" value="API Gateway&#xa;REST API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;strokeColor=#1976D2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="700" y="160" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="authorizer" value="Lambda&#xa;Authorizer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="790" y="160" width="80" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- IoT Core -->
+        <mxCell id="iot-core" value="AWS IoT Core&#xa;MQTT Broker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="920" y="160" width="100" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Business Logic Layer -->
+        <mxCell id="business-logic" value="Business Logic Layer (Lambda Functions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFC107;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="340" y="280" width="740" height="160" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="vehicle-mgmt" value="Vehicle&#xa;Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="360" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="telemetry-api" value="Telemetry&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="460" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="fleet-dashboard" value="Fleet&#xa;Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="560" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="notifications" value="Notifications&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="660" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="reports-api" value="Reports&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="760" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="video-processor" value="Video&#xa;Processor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="860" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="panic-processor" value="Panic&#xa;Processor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="960" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Sales Module -->
+        <mxCell id="sales-module" value="Sales Module (Lambda Functions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="360" y="380" width="320" height="80" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-clients" value="Clients&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="380" y="410" width="60" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-inventory" value="Inventory&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="450" y="410" width="60" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-contracts" value="Contracts&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="520" y="410" width="60" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-dashboard" value="Sales&#xa;Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="590" y="410" width="60" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Data Layer -->
+        <mxCell id="data-layer" value="Data Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="340" y="500" width="740" height="200" as="geometry"/>
+        </mxCell>
+        
+        <!-- DynamoDB Tables -->
+        <mxCell id="dynamodb-group" value="DynamoDB Tables" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=12;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="360" y="530" width="300" height="160" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="vehicles-table" value="Vehicles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;strokeColor=#1976D2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="380" y="560" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="users-table" value="Users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;strokeColor=#1976D2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="450" y="560" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="trips-table" value="Trips" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;strokeColor=#1976D2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="520" y="560" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alerts-table" value="Alerts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;strokeColor=#1976D2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="590" y="560" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-clients-table" value="Sales&#xa;Clients" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="380" y="600" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-inventory-table" value="Sales&#xa;Inventory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="450" y="600" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-contracts-table" value="Sales&#xa;Contracts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="520" y="600" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sales-quotations-table" value="Sales&#xa;Quotations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="590" y="600" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- ElastiCache -->
+        <mxCell id="elasticache" value="ElastiCache&#xa;Redis Cluster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="380" y="640" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- S3 Storage -->
+        <mxCell id="s3-group" value="S3 Storage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=12;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="700" y="530" width="160" height="160" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="web-interface-bucket" value="Web Interface&#xa;Bucket" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="720" y="560" width="80" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="video-storage-bucket" value="Video Storage&#xa;Bucket" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="720" y="600" width="80" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="reports-bucket" value="Reports&#xa;Bucket" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="720" y="640" width="80" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Real-time Processing -->
+        <mxCell id="realtime-layer" value="Real-time Processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF6F00;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="280" width="200" height="160" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="kinesis-streams" value="Kinesis&#xa;Data Streams" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#F57C00;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="telemetry-processor" value="Telemetry&#xa;Processor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF5722;strokeColor=#D84315;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="320" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Monitoring -->
+        <mxCell id="monitoring-layer" value="Monitoring &amp; Alerts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#F44336;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="480" width="200" height="120" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="cloudwatch" value="CloudWatch&#xa;Logs &amp; Metrics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F44336;strokeColor=#D32F2F;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="520" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sns" value="SNS&#xa;Notifications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#7B1FA2;fontColor=white;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="520" width="80" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Cost Information -->
+        <mxCell id="cost-info" value="💰 Cost Analysis&#xa;• Operational: ~$0.10/hour&#xa;• Monthly: ~$69&#xa;• 90% savings vs traditional" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=12;fontStyle=0;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="640" width="200" height="80" as="geometry"/>
+        </mxCell>
+        
+        <!-- Architecture Info -->
+        <mxCell id="arch-info" value="🏗️ Architecture Pattern&#xa;• Event-Driven Serverless&#xa;• Microservices&#xa;• 13 Terraform Modules&#xa;• 50+ AWS Resources" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;fontSize=12;fontStyle=0;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="120" width="200" height="120" as="geometry"/>
+        </mxCell>
+        
+        <!-- Performance Info -->
+        <mxCell id="perf-info" value="⚡ Performance&#xa;• API Response: &lt;200ms&#xa;• 99.9% Uptime&#xa;• Auto-scaling&#xa;• Multi-AZ deployment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFC107;fontSize=12;fontStyle=0;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="260" width="200" height="100" as="geometry"/>
+        </mxCell>
+        
+        <!-- Security Info -->
+        <mxCell id="security-info" value="🔒 Security&#xa;• Cognito Authentication&#xa;• IAM Least Privilege&#xa;• VPC Private Subnets&#xa;• Encryption at Rest/Transit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#F44336;fontSize=12;fontStyle=0;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="380" width="200" height="100" as="geometry"/>
+        </mxCell>
+        
+        <!-- Data Flow Arrows -->
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF6F00;" edge="1" parent="1" source="web-users" target="cloudfront">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF6F00;" edge="1" parent="1" source="mobile-users" target="api-gateway">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4CAF50;" edge="1" parent="1" source="iot-devices" target="iot-core">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9C27B0;" edge="1" parent="1" source="cameras" target="video-processor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#607D8B;" edge="1" parent="1" source="sales-agents" target="sales-clients">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2196F3;" edge="1" parent="1" source="api-gateway" target="vehicle-mgmt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4CAF50;" edge="1" parent="1" source="iot-core" target="kinesis-streams">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF9800;" edge="1" parent="1" source="kinesis-streams" target="telemetry-processor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2196F3;" edge="1" parent="1" source="vehicle-mgmt" target="vehicles-table">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4CAF50;" edge="1" parent="1" source="sales-clients" target="sales-clients-table">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="🔍 Legend&#xa;🟠 CDN/Security  🔵 API Layer  🔴 Lambda Functions&#xa;🟢 Sales Module  🟣 Data Storage  🟡 Real-time Processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;fontSize=11;fontStyle=0;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="50" y="420" width="250" height="80" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

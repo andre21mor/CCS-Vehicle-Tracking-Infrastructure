@@ -59,3 +59,16 @@ variable "blocked_countries" {
   type        = list(string)
   default     = []
 }
+
+# Variable para integración con WAF
+variable "waf_web_acl_id" {
+  description = "ARN del Web ACL de WAF para asociar con CloudFront"
+  type        = string
+  default     = ""
+}
+
+variable "additional_tags" {
+  description = "Tags adicionales para aplicar a los recursos"
+  type        = map(string)
+  default     = {}
+}
