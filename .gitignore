@@ -105,3 +105,6 @@ site/
 # Local development
 local/
 .local/
+
+# Draw.io files (mantener solo local)
+*.drawio
